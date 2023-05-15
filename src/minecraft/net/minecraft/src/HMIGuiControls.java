@@ -2,9 +2,9 @@ package net.minecraft.src;
 
 import org.lwjgl.input.Keyboard;
 
-public class GuiControlsHMI extends GuiScreen {
+public class HMIGuiControls extends GuiScreen {
 
-	public GuiControlsHMI(GuiScreen guiscreen)
+	public HMIGuiControls(GuiScreen guiscreen)
     {
         parentScreen = guiscreen;
     }

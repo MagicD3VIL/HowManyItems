@@ -4,7 +4,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import java.util.ArrayList;
 
-public class GuiTabOrder extends GuiScreen
+public class HMIGuiTabOrder extends GuiScreen
 {
 	private GuiScreen parentScreen;
 	
@@ -24,12 +24,12 @@ public class GuiTabOrder extends GuiScreen
 
     private float initialClickY;
     private long lastClicked;
-    private ArrayList<Tab> allTabs;
-    private ArrayList<Tab> currentTabs;
-    private Tab[] newOrder;
+    private ArrayList<HMITab> allTabs;
+    private ArrayList<HMITab> currentTabs;
+    private HMITab[] newOrder;
     private boolean[] tabEnabled;
 
-	public GuiTabOrder(GuiScreen guiscreen)
+	public HMIGuiTabOrder(GuiScreen guiscreen)
 	{
 		initialClickY = -2F;
 		lastClicked = 0L;
@@ -39,7 +39,7 @@ public class GuiTabOrder extends GuiScreen
 		slotHeight =  21;
 		currentTabs = mod_HowManyItems.getTabs();
 		allTabs = mod_HowManyItems.allTabs;
-		newOrder = new Tab[allTabs.size()];
+		newOrder = new HMITab[allTabs.size()];
 		tabEnabled = new boolean[allTabs.size()];
 	}
 
@@ -52,9 +52,9 @@ public class GuiTabOrder extends GuiScreen
 		for(int i = 0; i < currentTabs.size(); i++) {
 			newOrder[i] = currentTabs.get(i);
 			tabEnabled[i] = true;
-			controlList.add(new GuiButtonHMI(controlList.size(), -1, -1, BUTTON_HEIGHT, 3));
+			controlList.add(new HMIGuiButton(controlList.size(), -1, -1, BUTTON_HEIGHT, 3));
 			if(i == 0) ((GuiButton)controlList.get(controlList.size() - 1)).enabled = false;
-			controlList.add(new GuiButtonHMI(controlList.size(), -1, -1, BUTTON_HEIGHT, 4));
+			controlList.add(new HMIGuiButton(controlList.size(), -1, -1, BUTTON_HEIGHT, 4));
 			String s = currentTabs.get(i).TAB_CREATOR.getClass().getSimpleName().replaceFirst("mod_", "");
 			s += " - " + currentTabs.get(i).name() + ": Enabled";
 			controlList.add(new GuiSmallButton(controlList.size(), -1, -1, 268, BUTTON_HEIGHT, s));
@@ -63,9 +63,9 @@ public class GuiTabOrder extends GuiScreen
 			if(!currentTabs.contains(allTabs.get(i))) {
 				newOrder[controlList.size() / 3] = allTabs.get(i);
 				tabEnabled[controlList.size() / 3] = false;
-				controlList.add(new GuiButtonHMI(controlList.size(), -1, -1, BUTTON_HEIGHT, 3));
+				controlList.add(new HMIGuiButton(controlList.size(), -1, -1, BUTTON_HEIGHT, 3));
 				((GuiButton)controlList.get(controlList.size() - 1)).enabled = false;
-				controlList.add(new GuiButtonHMI(controlList.size(), -1, -1, BUTTON_HEIGHT, 4));
+				controlList.add(new HMIGuiButton(controlList.size(), -1, -1, BUTTON_HEIGHT, 4));
 				((GuiButton)controlList.get(controlList.size() - 1)).enabled = false;
 				String s = allTabs.get(i).TAB_CREATOR.getClass().getSimpleName().replaceFirst("mod_", "");
 				s += " - " + allTabs.get(i).name() + ": Disabled";
@@ -121,7 +121,7 @@ public class GuiTabOrder extends GuiScreen
 				boolean tempBool = tabEnabled[index];
 				tabEnabled[index] = tabEnabled[index + upOrDown];
 				tabEnabled[index + upOrDown] = tempBool;
-				Tab tempTab = newOrder[index];
+				HMITab tempTab = newOrder[index];
 				newOrder[index] = newOrder[index + upOrDown];
 				newOrder[index + upOrDown] = tempTab;
 				String tempString = ((GuiButton)controlList.get(index * 3 + 2)).displayString;

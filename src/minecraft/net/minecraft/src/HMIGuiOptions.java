@@ -1,8 +1,8 @@
 package net.minecraft.src;
 
-public class GuiOptionsHMI extends GuiScreen {
+public class HMIGuiOptions extends GuiScreen {
 
-	public GuiOptionsHMI(GuiScreen guiscreen)
+	public HMIGuiOptions(GuiScreen guiscreen)
     {
         parentScreen = guiscreen;
     }
@@ -26,7 +26,7 @@ public class GuiOptionsHMI extends GuiScreen {
         controlList.add(buttonIDs = new GuiSmallButton(++i, (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Item IDs: " + (HMIConfig.showItemIDs ? "ON" : "OFF")));
         controlList.add(buttonCentredSearchBar = new GuiSmallButton(++i, (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Centred Search Bar: " + (HMIConfig.centredSearchBar ? "ON" : "OFF")));
         controlList.add(buttonFastSearch = new GuiSmallButton(++i, (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Fast Search: " + (HMIConfig.fastSearch ? "ON" : "OFF")));
-        controlList.add(buttonHiding = new GuiSmallButton(++i, (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Hide Items Mode: " + (GuiOverlay.showHiddenItems ? "ON" : "OFF")));
+        controlList.add(buttonHiding = new GuiSmallButton(++i, (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Hide Items Mode: " + (HMIGuiOverlay.showHiddenItems ? "ON" : "OFF")));
         controlList.add(buttonInvertedScroll = new GuiSmallButton(++i, (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Flip Scroll Direction: " + (HMIConfig.scrollInverted ? "ON" : "OFF")));
 
         //controlList.add(new GuiButton(++i, width / 2 - 100, height / 6 + 72 + 12, "Commands & Loadout Names..."));
@@ -60,9 +60,9 @@ public class GuiOptionsHMI extends GuiScreen {
         }
         else if(guibutton == buttonHiding)
         {
-        	GuiOverlay.showHiddenItems = !GuiOverlay.showHiddenItems;
-        	GuiOverlay.resetItems();
-        	buttonHiding.displayString = "Hide Items Mode: " + (GuiOverlay.showHiddenItems ? "ON" : "OFF");
+        	HMIGuiOverlay.showHiddenItems = !HMIGuiOverlay.showHiddenItems;
+        	HMIGuiOverlay.resetItems();
+        	buttonHiding.displayString = "Hide Items Mode: " + (HMIGuiOverlay.showHiddenItems ? "ON" : "OFF");
         }
         else if(guibutton == buttonInvertedScroll)
         {
@@ -71,18 +71,18 @@ public class GuiOptionsHMI extends GuiScreen {
         }
         else if(guibutton == buttonDone)
         {
-        	GuiOverlay.guiClosedCooldown = System.currentTimeMillis() + 100L;
+        	HMIGuiOverlay.guiClosedCooldown = System.currentTimeMillis() + 100L;
             mc.displayGuiScreen(parentScreen);
             return;
         }
         else if(guibutton == buttonKeybinds)
         {
-            mc.displayGuiScreen(new GuiControlsHMI(this));
+            mc.displayGuiScreen(new HMIGuiControls(this));
             return;
         }
         else if(guibutton == buttonTabOrder)
         {
-            mc.displayGuiScreen(new GuiTabOrder(this));
+            mc.displayGuiScreen(new HMIGuiTabOrder(this));
             return;
         }
         mod_HowManyItems.onSettingChanged();

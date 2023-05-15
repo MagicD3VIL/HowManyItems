@@ -11,27 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class GuiOverlay extends GuiScreen {
+public class HMIGuiOverlay extends GuiScreen {
 
 	public static GuiContainer screen;
 	private final int BUTTON_HEIGHT = 20;
 	private static ArrayList<ItemStack> currentItems;
 	
 	public static ItemStack hoverItem;
-	private static GuiTextFieldHMI searchBox;
+	private static HMIGuiTextField searchBox;
 	private static int index = 0;
 	private int itemsPerPage;
 	
-	private GuiButtonHMI buttonNextPage;
-	private GuiButtonHMI buttonPrevPage;
-	private GuiButtonHMI buttonOptions;
+	private HMIGuiButton buttonNextPage;
+	private HMIGuiButton buttonPrevPage;
+	private HMIGuiButton buttonOptions;
 	
-	private GuiButtonHMI buttonTimeDay;
-	private GuiButtonHMI buttonTimeNight;
-	private GuiButtonHMI buttonToggleRain;
-	private GuiButtonHMI buttonHeal;
-	private GuiButtonHMI buttonTrash;
-	private GuiButtonHMI buttonToggleGamemode;
+	private HMIGuiButton buttonTimeDay;
+	private HMIGuiButton buttonTimeNight;
+	private HMIGuiButton buttonToggleRain;
+	private HMIGuiButton buttonHeal;
+	private HMIGuiButton buttonTrash;
 	
 	private ItemStack guiBlock;
 	
@@ -42,27 +41,27 @@ public class GuiOverlay extends GuiScreen {
 	public int xSize = 0;
 	public int ySize = 0;
  	
-	public GuiOverlay(GuiContainer gui) {
+	public HMIGuiOverlay(GuiContainer gui) {
 		super();
-		if(hiddenItems == null) hiddenItems = Utils.hiddenItems;
-		if(currentItems == null) currentItems = getCurrentList(Utils.itemList());
+		if(hiddenItems == null) hiddenItems = HMIUtils.hiddenItems;
+		if(currentItems == null) currentItems = getCurrentList(HMIUtils.itemList());
 		screen = gui;
 		lastKeyTimeout = System.currentTimeMillis() + 200L;
 		lastKey = Keyboard.getEventKey();
 		
-		if(mod_HowManyItems.getTabs().size() > 0) guiBlock = TabUtils.getItemFromGui(screen);
+		if(mod_HowManyItems.getTabs().size() > 0) guiBlock = HMITabUtils.getItemFromGui(screen);
 		
-		setWorldAndResolution(Utils.mc, screen.width, screen.height);
+		setWorldAndResolution(HMIUtils.mc, screen.width, screen.height);
 		
 	}
 	
-	private static Field xSizeField = Utils.getField(GuiContainer.class, new String[] {"xSize", "a"});
-	private static Field ySizeField = Utils.getField(GuiContainer.class, new String[] {"ySize", "i"});
-	private static Method mouseClickedMethod = Utils.getMethod(GuiScreen.class, new String[] {"mouseClicked", "a"}, new Class<?>[] {int.class, int.class, int.class});
-	private static Method keyTypedMethod = Utils.getMethod(GuiScreen.class, new String[] {"keyTyped", "a"}, new Class<?>[] {char.class, int.class});
-	private static Method mouseMovedOrUpMethod = Utils.getMethod(GuiScreen.class, new String[] {"mouseMovedOrUp", "b"}, new Class<?>[] {int.class, int.class, int.class});
+	private static Field xSizeField = HMIUtils.getField(GuiContainer.class, new String[] {"xSize", "a"});
+	private static Field ySizeField = HMIUtils.getField(GuiContainer.class, new String[] {"ySize", "i"});
+	private static Method mouseClickedMethod = HMIUtils.getMethod(GuiScreen.class, new String[] {"mouseClicked", "a"}, new Class<?>[] {int.class, int.class, int.class});
+	private static Method keyTypedMethod = HMIUtils.getMethod(GuiScreen.class, new String[] {"keyTyped", "a"}, new Class<?>[] {char.class, int.class});
+	private static Method mouseMovedOrUpMethod = HMIUtils.getMethod(GuiScreen.class, new String[] {"mouseMovedOrUp", "b"}, new Class<?>[] {int.class, int.class, int.class});
 	
-	private static Field worldInfoField = Utils.getField(World.class, new String[] {"worldInfo", "x"});
+	private static Field worldInfoField = HMIUtils.getField(World.class, new String[] {"worldInfo", "x"});
 	
 	public void initGui() {
 		try {
@@ -82,34 +81,28 @@ public class GuiOverlay extends GuiScreen {
 			searchBoxWidth = xSize - BUTTON_HEIGHT - 3;
 		}
 		int id = 0;
-		searchBox = new GuiTextFieldHMI(screen, fontRenderer, searchBoxX, screen.height - BUTTON_HEIGHT + 1, searchBoxWidth, BUTTON_HEIGHT - 4, search);
+		searchBox = new HMIGuiTextField(screen, fontRenderer, searchBoxX, screen.height - BUTTON_HEIGHT + 1, searchBoxWidth, BUTTON_HEIGHT - 4, search);
 		searchBox.setMaxStringLength((searchBoxWidth - 10) / 6);
-		controlList.add(buttonOptions = new GuiButtonHMI(id++, searchBoxX + searchBoxWidth + 1, screen.height - BUTTON_HEIGHT - 1, BUTTON_HEIGHT, HMIConfig.cheatsEnabled ? 1 : 0, guiBlock));
-		controlList.add(buttonNextPage = new GuiButtonHMI(id++, screen.width - (screen.width - k - xSize) / 3, 0, (screen.width - k - xSize) / 3, BUTTON_HEIGHT, "Next"));
-		controlList.add(buttonPrevPage = new GuiButtonHMI(id++, k + xSize, 0, (screen.width - k - xSize) / 3, BUTTON_HEIGHT, "Prev"));
+		controlList.add(buttonOptions = new HMIGuiButton(id++, searchBoxX + searchBoxWidth + 1, screen.height - BUTTON_HEIGHT - 1, BUTTON_HEIGHT, HMIConfig.cheatsEnabled ? 1 : 0, guiBlock));
+		controlList.add(buttonNextPage = new HMIGuiButton(id++, screen.width - (screen.width - k - xSize) / 3, 0, (screen.width - k - xSize) / 3, BUTTON_HEIGHT, "Next"));
+		controlList.add(buttonPrevPage = new HMIGuiButton(id++, k + xSize, 0, (screen.width - k - xSize) / 3, BUTTON_HEIGHT, "Prev"));
 		if(HMIConfig.cheatsEnabled) {
 			boolean mp = mc.theWorld.multiplayerWorld;
 			if(!mp || !HMIConfig.mpTimeDayCommand.isEmpty()) 
-				controlList.add(buttonTimeDay = new GuiButtonHMI(id++, 0, 0, BUTTON_HEIGHT, 12));
+				controlList.add(buttonTimeDay = new HMIGuiButton(id++, 0, 0, BUTTON_HEIGHT, 12));
 			if(!mp || !HMIConfig.mpTimeNightCommand.isEmpty()) 
-				controlList.add(buttonTimeNight = new GuiButtonHMI(id++, BUTTON_HEIGHT, 0, BUTTON_HEIGHT, 13));
+				controlList.add(buttonTimeNight = new HMIGuiButton(id++, BUTTON_HEIGHT, 0, BUTTON_HEIGHT, 13));
 			if(!mp || !HMIConfig.mpRainOFFCommand.isEmpty() || !HMIConfig.mpRainONCommand.isEmpty()) 
-				controlList.add(buttonToggleRain = new GuiButtonHMI(id++, BUTTON_HEIGHT * 2, 0, BUTTON_HEIGHT, 14));
+				controlList.add(buttonToggleRain = new HMIGuiButton(id++, BUTTON_HEIGHT * 2, 0, BUTTON_HEIGHT, 14));
 			if(!mp || !HMIConfig.mpHealCommand.isEmpty()) 
-				controlList.add(buttonHeal = new GuiButtonHMI(id++, BUTTON_HEIGHT * 3, 0, BUTTON_HEIGHT, 15));
-			if(!mp || !HMIConfig.mpGamemodeSCommand.isEmpty()) 
-				controlList.add(buttonToggleGamemode = new GuiButtonHMI(id++, BUTTON_HEIGHT * 4, 0, BUTTON_HEIGHT, getGamemodeIcon()));
+				controlList.add(buttonHeal = new HMIGuiButton(id++, BUTTON_HEIGHT * 3, 0, BUTTON_HEIGHT, 15));
 			if(!mp) 
-				controlList.add(buttonTrash = new GuiButtonHMI(id++, 0, screen.height - BUTTON_HEIGHT - 1, 60, BUTTON_HEIGHT, "Trash"));
+				controlList.add(buttonTrash = new HMIGuiButton(id++, 0, screen.height - BUTTON_HEIGHT - 1, 60, BUTTON_HEIGHT, "Trash"));
 		}
 	}
 	
 	
 	public void drawScreen(int posX, int posY) {
-		
-		
-		
-		
 		boolean shiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
 		if(shiftHeld && mod_HowManyItems.getTabs().size() > 0) {
 			buttonOptions.iconIndex = 2;
@@ -127,7 +120,7 @@ public class GuiOverlay extends GuiScreen {
 		int k = (screen.width - xSize) / 2 + xSize + 1;
 		int w = screen.width - (screen.width - xSize) / 2 - xSize - 1;
 
-		Utils.disableLighting();
+		HMIUtils.disableLighting();
 		for(int kx = 0; kx < controlList.size(); kx++)
 		{
 			((GuiButton)controlList.get(kx)).drawButton(mc, posX, posY);
@@ -167,42 +160,42 @@ public class GuiOverlay extends GuiScreen {
 				hoverItem = currentItems.get(i);
                 if(!hiddenItems.contains(currentItems.get(i))) {
                 	if(!showHiddenItems) {
-                		Utils.drawSlot(slotX, slotY, white);
+                		HMIUtils.drawSlot(slotX, slotY, white);
                 	}
                 	else if(draggingFrom == null || !hiddenItems.contains(draggingFrom)){
-                		Utils.drawSlot(slotX, slotY, lightRed);
+                		HMIUtils.drawSlot(slotX, slotY, lightRed);
                 	}
-                	else Utils.drawSlot(slotX, slotY, green);
+                	else HMIUtils.drawSlot(slotX, slotY, green);
                 }
                 else {
                 	if(draggingFrom == null || hiddenItems.contains(draggingFrom))
-                		Utils.drawSlot(slotX, slotY, green);
-                	else Utils.drawSlot(slotX, slotY, lightRed);
+                		HMIUtils.drawSlot(slotX, slotY, green);
+                	else HMIUtils.drawSlot(slotX, slotY, lightRed);
                 }
 			}
 			else if(showHiddenItems && hoverItem != null && currentItems.indexOf(hoverItem) < i && hoverItem.itemID == currentItems.get(i).itemID && shiftHeld && !Mouse.isButtonDown(0)) {
 				if(!hiddenItems.contains(hoverItem)) 
-					Utils.drawSlot(slotX, slotY, lightRed);
+					HMIUtils.drawSlot(slotX, slotY, lightRed);
 					else
-						Utils.drawSlot(slotX, slotY, green);
+						HMIUtils.drawSlot(slotX, slotY, green);
 			}
 			else if(hiddenItems.contains(currentItems.get(i)) && draggingFrom == null) {
-				Utils.drawSlot(slotX, slotY, darkRed);
+				HMIUtils.drawSlot(slotX, slotY, darkRed);
 			}
 			else if (showHiddenItems && draggingFrom != null && hoverItem != null){
 				if((currentItems.indexOf(draggingFrom) <= i && i < currentItems.indexOf(hoverItem) || (currentItems.indexOf(draggingFrom) >= i && i > currentItems.indexOf(hoverItem)))){
 					if(!hiddenItems.contains(draggingFrom))
-						Utils.drawSlot(slotX, slotY, lightRed);
+						HMIUtils.drawSlot(slotX, slotY, lightRed);
 					else
-						Utils.drawSlot(slotX, slotY, green);
+						HMIUtils.drawSlot(slotX, slotY, green);
 					
 				}
 				else {
 					if(hiddenItems.contains(currentItems.get(i)))
-						Utils.drawSlot(slotX, slotY, darkRed);
+						HMIUtils.drawSlot(slotX, slotY, darkRed);
 				}
 			}
-			Utils.drawItemStack(slotX + 1, slotY + 1, currentItems.get(i), true);
+			HMIUtils.drawItemStack(slotX + 1, slotY + 1, currentItems.get(i), true);
 			x++;
 			if(i == currentItems.size() - 1) {
 				if((canvasHeight / 18) * (w / 18) > currentItems.size()) {
@@ -243,143 +236,148 @@ public class GuiOverlay extends GuiScreen {
 		if(itemsPerPage < currentItems.size()) {
 			pageIndex = index / itemsPerPage;
 		}
-		Utils.disableLighting();
+		HMIUtils.disableLighting();
 		String page = (pageIndex + 1) + "/" + (currentItems.size() / itemsPerPage + 1);
 		fontRenderer.drawStringWithShadow(page, screen.width - w/2 - fontRenderer.getStringWidth(page)/2, 6, 0xffffff);
 		buttonNextPage.enabled = buttonPrevPage.enabled = itemsPerPage < currentItems.size();
         if(inventoryplayer.getItemStack() != null)
         {
-        	Utils.drawItemStack(posX - 8, posY - 8, inventoryplayer.getItemStack(), true);
+        	HMIUtils.drawItemStack(posX - 8, posY - 8, inventoryplayer.getItemStack(), true);
         }
 		if(!itemHovered) {
 			hoverItem = null;
 		}
-			String s = "";
-				if (inventoryplayer.getItemStack() == null && hoverItem != null) {
-					if(!showHiddenItems) {
-						s = Utils.getNiceItemName(hoverItem); 
+		String string = "";
+		if (inventoryplayer.getItemStack() == null && hoverItem != null) {
+			if(!showHiddenItems) {
+				string = HMIUtils.getNiceItemName(hoverItem);
+			}
+			else {
+				if(draggingFrom != null && draggingFrom != hoverItem) {
+					if(hiddenItems.contains(hoverItem)) {
+						string = "Unhide selected items";
 					}
 					else {
-						if(draggingFrom != null && draggingFrom != hoverItem) {
-							if(hiddenItems.contains(hoverItem)) {
-								s = "Unhide selected items";
-							}
-							else {
-								s = "Hide selected items";
-							}
-						}
-						else if(hiddenItems.contains(hoverItem)) {
-							if(shiftHeld && hoverItem.getHasSubtypes()) {
-								s = "Unhide all items with same ID and higher dmg";
-							}
-							else {
-								s = "Unhide " + Utils.getNiceItemName(hoverItem); 
-							}
-						}
-						else {
-							if(shiftHeld && hoverItem.getHasSubtypes()) {
-								s = "Hide all items with same ID and higher dmg";
-							}
-							else {
-								s = "Hide " + Utils.getNiceItemName(hoverItem); 
-							}
-						}
+						string = "Hide selected items";
 					}
 				}
-				else if(HMIConfig.cheatsEnabled && inventoryplayer.getItemStack() != null && (hoverItem != null || (posX > k + (w % 18)/2 && posY > screen.height - BUTTON_HEIGHT + (canvasHeight % 18) /2 - canvasHeight
-						&& posX < screen.width - (w % 18)/2 && posY > BUTTON_HEIGHT + (canvasHeight % 18) /2  && posY < BUTTON_HEIGHT + canvasHeight))) 
-				{
-					s = "Delete " + Utils.getNiceItemName(inventoryplayer.getItemStack());
-				}
-				else if(buttonOptions.mousePressed(mc, posX, posY)) 
-				{
-					if(!shiftHeld || mod_HowManyItems.getTabs().size() == 0) {
-						s = "Settings";
-					}
-					else if(guiBlock != null) {
-						s = "View " + Utils.getNiceItemName(guiBlock, false) + " Recipes";
+				else if(hiddenItems.contains(hoverItem)) {
+					if(shiftHeld && hoverItem.getHasSubtypes()) {
+						string = "Unhide all items with same ID and higher dmg";
 					}
 					else {
-						s = "View All Recipes";
+						string = "Unhide " + HMIUtils.getNiceItemName(hoverItem);
 					}
 				}
-				else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonTimeDay.mousePressed(mc, posX, posY)) 
-				{
-					s = "Set time to day";
-				}
-				else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonTimeNight.mousePressed(mc, posX, posY)) 
-				{
-					s = "Set time to night";
-				}
-				else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonToggleRain.mousePressed(mc, posX, posY)) 
-				{
-					s = "Toggle rain";
-				}
-				else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonHeal.mousePressed(mc, posX, posY)) 
-				{
-					s = "Heal";
-				}
-				else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonHeal.mousePressed(mc, posX, posY)) 
-				{
-					s = "Heal";
-				}
-				else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonToggleGamemode.mousePressed(mc, posX, posY))
-				{
-					s = "Toggle Gamemode";
-				}
-				else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonTrash.mousePressed(mc, posX, posY)) 
-				{
-					if(inventoryplayer.getItemStack() == null) {
-						if(shiftHeld) {
-							s = "Delete ALL Items";
-						}
-						else s = "Drag item here to delete";
+				else {
+					if(shiftHeld && hoverItem.getHasSubtypes()) {
+						string = "Hide all items with same ID and higher dmg";
 					}
 					else {
-						if(shiftHeld) {
-							s = "Delete ALL " + Utils.getNiceItemName(inventoryplayer.getItemStack());
-						}
-						else s = "Delete " + Utils.getNiceItemName(inventoryplayer.getItemStack());
+						string = "Hide " + HMIUtils.getNiceItemName(hoverItem);
 					}
 				}
-				if(s.length() > 0)
-				{
-					int k1 = posX;
-					int i2 = posY;
-					int j2 = fontRenderer.getStringWidth(s);
-					if(k1 + j2 + 12 > screen.width - 3)
-					{
-						k1 -= (k1 + j2 + 12) - screen.width + 2;
-					}
-					if(i2 - 15 < 0)
-					{
-						i2 -= (i2 - 15);
-					}
-					Utils.drawTooltip(s, k1, i2);
+			}
+		}
+		else if(HMIConfig.cheatsEnabled && inventoryplayer.getItemStack() != null && (hoverItem != null || (posX > k + (w % 18)/2 && posY > screen.height - BUTTON_HEIGHT + (canvasHeight % 18) /2 - canvasHeight
+				&& posX < screen.width - (w % 18)/2 && posY > BUTTON_HEIGHT + (canvasHeight % 18) /2  && posY < BUTTON_HEIGHT + canvasHeight)))
+		{
+			string = "Delete " + HMIUtils.getNiceItemName(inventoryplayer.getItemStack());
+		}
+		else if(buttonOptions.mousePressed(mc, posX, posY))
+		{
+			if(!shiftHeld || mod_HowManyItems.getTabs().size() == 0) {
+				string = "Settings";
+			}
+			else if(guiBlock != null) {
+				string = "View " + HMIUtils.getNiceItemName(guiBlock, false) + " Recipes";
+			}
+			else {
+				string = "View All Recipes";
+			}
+		}
+		else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonTimeDay.mousePressed(mc, posX, posY))
+		{
+			string = "Set time to day";
+		}
+		else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonTimeNight.mousePressed(mc, posX, posY))
+		{
+			string = "Set time to night";
+		}
+		else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonToggleRain.mousePressed(mc, posX, posY))
+		{
+			string = "Toggle rain";
+		}
+		else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonHeal.mousePressed(mc, posX, posY))
+		{
+			string = "Heal";
+		}
+		else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonHeal.mousePressed(mc, posX, posY))
+		{
+			string = "Heal";
+		}
+		else if(HMIConfig.cheatsEnabled && !mc.theWorld.multiplayerWorld && buttonTrash.mousePressed(mc, posX, posY))
+		{
+			if(inventoryplayer.getItemStack() == null) {
+				if(shiftHeld) {
+					string = "Delete ALL Items";
 				}
-				else if(inventoryplayer.getItemStack() == null && Utils.hoveredItem(screen, posX, posY) != null) {
-					ItemStack item = Utils.hoveredItem(screen, posX, posY);
-					if (item != null) {
-						s = StringTranslate.getInstance().translateNamedKey(item.getItem().getItemName());
-					}
-					int k1 = posX;
-					int i2 = posY;
-					int j2 = fontRenderer.getStringWidth(s);
-					if(k1 + 9 <= k && k1 + j2 + 15 > k) {
-						Utils.drawRect(k, i2 - 15, k1 + j2 + 15, i2 - 1, 0xc0000000);
-						fontRenderer.drawStringWithShadow(s, k1 + 12, i2 - 12, -1);
-					}
-					if(s.length() == 0) {
-						Utils.drawTooltip(Utils.getNiceItemName(item), k1, i2);
-					}
-					else if(HMIConfig.showItemIDs) {
-						s = " " + item.itemID;
-						if(item.getHasSubtypes()) s+= ":" + item.getItemDamage();
-						int j3 = fontRenderer.getStringWidth(s);
-						Utils.drawRect(k1 + j2 + 15, i2 - 15, k1 + j2 + j3 + 15, i2 + 8 - 9, 0xc0000000);
-						fontRenderer.drawStringWithShadow(s, k1 + j2 + 12, i2 - 12, -1);
+				else string = "Drag item here to delete";
+			}
+			else {
+				if(shiftHeld) {
+					string = "Delete ALL " + HMIUtils.getNiceItemName(inventoryplayer.getItemStack());
+				}
+				else string = "Delete " + HMIUtils.getNiceItemName(inventoryplayer.getItemStack());
+			}
+		}
+		if(string.length() > 0)
+		{
+			int k1 = posX;
+			int i2 = posY;
+			int j2 = fontRenderer.getStringWidth(string);
+			if(k1 + j2 + 12 > screen.width - 3)
+			{
+				k1 -= (k1 + j2 + 12) - screen.width + 2;
+			}
+			if(i2 - 15 < 0)
+			{
+				i2 -= (i2 - 15);
+			}
+			HMIUtils.drawTooltip(string, k1, i2);
+		}
+		else if(inventoryplayer.getItemStack() == null && HMIUtils.hoveredItem(screen, posX, posY) != null) {
+			ItemStack item = HMIUtils.hoveredItem(screen, posX, posY);
+			String nameID = "";
+			if (item != null) {
+				/* TODO: Changed to resemble the GuiContainer original method name getter
+				s = StringTranslate.getInstance().translateNamedKey(item.getItem().getItemName());
+				*/
+				string = HMIUtils.getNiceItemName(item, false);
+				if (HMIConfig.showItemIDs) {
+					nameID = " " + item.itemID;
+					if (item.getHasSubtypes()) nameID += ":" + item.getItemDamage();
+				}
+			}
+			int itemNameWidth = fontRenderer.getStringWidth(string);
+			int nameIDWidth = 0;
+			int startMargin = string.length() == 0 ? 6 : 0;
+
+			if (nameID.length() != 0) nameIDWidth = fontRenderer.getStringWidth(nameID);
+			if (posX + 9 <= k) {
+				if (HMIConfig.showItemIDs && (posX + itemNameWidth + nameIDWidth + 15 <= k)) {
+					HMIUtils.drawRect(posX + 15 + itemNameWidth - startMargin, posY - 15, posX + itemNameWidth + 15 + nameIDWidth, posY - 1, 0xc0000000);
+				} else {
+					if (startMargin != 6) {
+						HMIUtils.drawRect(k, posY - 15, posX + itemNameWidth + nameIDWidth + 15, posY - 1, 0xc0000000);
 					}
 				}
+				if (posX + itemNameWidth + nameIDWidth + 15 > k && posX + itemNameWidth + 15 <= k) {
+					HMIUtils.drawRect(posX + 15 + itemNameWidth - startMargin, posY - 15, k, posY - 1, 0xc0000000);
+				}
+				fontRenderer.drawStringWithShadow(string + nameID, posX + 12, posY - 12, -1);
+			}
+		}
 	}
 	
 	
@@ -511,7 +509,7 @@ public class GuiOverlay extends GuiScreen {
 				}
 			}
 			else {
-				mc.displayGuiScreen(new GuiOptionsHMI(screen));
+				mc.displayGuiScreen(new HMIGuiOptions(screen));
 			}
 		}
 		else if(guibutton == buttonTimeDay || guibutton == buttonTimeNight || guibutton == buttonToggleRain) {
@@ -562,7 +560,7 @@ public class GuiOverlay extends GuiScreen {
 				mc.thePlayer.air = 300;
 				if(mc.thePlayer.isBurning()) {
 					mc.thePlayer.fire = -mc.thePlayer.fireResistance;
-					mc.theWorld.playSoundAtEntity(mc.thePlayer, "random.fizz", 0.7F, 1.6F + (Utils.rand.nextFloat() - Utils.rand.nextFloat()) * 0.4F);
+					mc.theWorld.playSoundAtEntity(mc.thePlayer, "random.fizz", 0.7F, 1.6F + (HMIUtils.rand.nextFloat() - HMIUtils.rand.nextFloat()) * 0.4F);
 				}
 			}
 			else {
@@ -572,7 +570,7 @@ public class GuiOverlay extends GuiScreen {
 		else if(!mc.theWorld.multiplayerWorld && guibutton == buttonTrash) {
 			if(mc.thePlayer.inventory.getItemStack() == null) {
 				if(shiftHeld) {
-					if(!(screen instanceof GuiRecipeViewer) && System.currentTimeMillis() > deleteAllWaitUntil)
+					if(!(screen instanceof HMIGuiRecipeViewer) && System.currentTimeMillis() > deleteAllWaitUntil)
                     {
                         for(int i = 0; i < screen.inventorySlots.slots.size(); i++)
                         {
@@ -610,8 +608,8 @@ public class GuiOverlay extends GuiScreen {
 				int j2 = scaledresolution.getScaledHeight();
 				int posX = (Mouse.getEventX() * i2) / mc.displayWidth;
 				int posY = j2 - (Mouse.getEventY() * j2) / mc.displayHeight - 1;
-				if((Utils.hoveredItem(screen, posX, posY) == null && hoverItem == null) || (i != HMIConfig.pushRecipe.keyCode && i != HMIConfig.pushUses.keyCode)){
-					if(!(screen instanceof GuiRecipeViewer) || i != HMIConfig.prevRecipe.keyCode)
+				if((HMIUtils.hoveredItem(screen, posX, posY) == null && hoverItem == null) || (i != HMIConfig.pushRecipe.keyCode && i != HMIConfig.pushUses.keyCode)){
+					if(!(screen instanceof HMIGuiRecipeViewer) || i != HMIConfig.prevRecipe.keyCode)
 						if(System.currentTimeMillis() > lastKeyTimeout)
 					searchBox.isFocused = true;
 				}
@@ -631,7 +629,7 @@ public class GuiOverlay extends GuiScreen {
 				resetItems();
 			}
 			else if(searchBox.getText().length() < lastSearch.length()) {
-				if(prevSearches.isEmpty()) currentItems = getCurrentList(Utils.itemList());
+				if(prevSearches.isEmpty()) currentItems = getCurrentList(HMIUtils.itemList());
 				else currentItems = prevSearches.pop();
 			}
 			lastSearch = searchBox.getText();
@@ -645,11 +643,11 @@ public class GuiOverlay extends GuiScreen {
         			lastKeyTimeout = System.currentTimeMillis() + 200L;
                 	if(mc.currentScreen == this) {
                 		if(i == HMIConfig.allRecipes.keyCode && mc.thePlayer.inventory.getItemStack() == null) {
-                			if (screen instanceof GuiRecipeViewer) {
-                				((GuiRecipeViewer) screen).push(null, false);
+                			if (screen instanceof HMIGuiRecipeViewer) {
+                				((HMIGuiRecipeViewer) screen).push(null, false);
                 			}
                 			else if (mod_HowManyItems.getTabs().size() > 0){
-                				GuiRecipeViewer newgui = new GuiRecipeViewer(null, false, screen);
+                				HMIGuiRecipeViewer newgui = new HMIGuiRecipeViewer(null, false, screen);
                 				mc.currentScreen = newgui;
                 				ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
                 				int i2 = scaledresolution.getScaledWidth();
@@ -657,7 +655,7 @@ public class GuiOverlay extends GuiScreen {
                 	            newgui.setWorldAndResolution(mc, i2, j2);
                 			}
                 		}
-                		else if(i == Keyboard.KEY_ESCAPE && screen instanceof GuiRecipeViewer) {
+                		else if(i == Keyboard.KEY_ESCAPE && screen instanceof HMIGuiRecipeViewer) {
 
                         	//("KEY TYPED");
                 		}
@@ -676,7 +674,7 @@ public class GuiOverlay extends GuiScreen {
     }
 	
 	public static void resetItems() {
-		currentItems = getCurrentList(Utils.itemList());
+		currentItems = getCurrentList(HMIUtils.itemList());
 		prevSearches.clear();
 	}
 	
@@ -775,27 +773,30 @@ public class GuiOverlay extends GuiScreen {
 			searchBox.isFocused = true;
 			searchBox.setText("");
 			searchBox.isFocused = wasFocused;
-			currentItems = getCurrentList(Utils.itemList());
+			currentItems = getCurrentList(HMIUtils.itemList());
 			prevSearches.clear();
 		}
 	}
 	
 	private static ArrayList<ItemStack> getCurrentList(ArrayList<ItemStack> listToSearch){
 		index = 0;
-		ArrayList<ItemStack> newList = new ArrayList<ItemStack>();
+		ArrayList<ItemStack> newList = new ArrayList<>();
 		if(searchBox != null && searchBox.getText().length() > 0) {
 			for(ItemStack currentItem : listToSearch) {
+				String s = HMIUtils.getNiceItemName(currentItem, false);
+				/* TODO: Changed to use the method we created instead of duplicate code...
 				String s = (new StringBuilder()).append("").append(StringTranslate.getInstance().translateNamedKey(currentItem.getItem().getItemName())).toString().trim();
+				*/
 				if(s.toLowerCase().contains(searchBox.getText().toLowerCase()) && (showHiddenItems || !hiddenItems.contains(currentItem))) {
 					newList.add(currentItem);
 				}
 			}
 		}
 		else if(showHiddenItems) {
-			return new ArrayList<ItemStack>(Utils.itemList());
+			return new ArrayList<>(HMIUtils.itemList());
 		}
 		else {
-			for(ItemStack currentItem : Utils.itemList()) {
+			for(ItemStack currentItem : HMIUtils.itemList()) {
 				if(!hiddenItems.contains(currentItem)) {
 					newList.add(currentItem);
 				}
@@ -803,7 +804,8 @@ public class GuiOverlay extends GuiScreen {
 		}
 		return newList;
 	}
-	private static Stack<ArrayList<ItemStack>> prevSearches = new Stack<ArrayList<ItemStack>>(); 
+
+	private static Stack<ArrayList<ItemStack>> prevSearches = new Stack<>();
 	private static String lastSearch = "";
 	public boolean modTickKeyPress = false;
 
@@ -822,7 +824,7 @@ public class GuiOverlay extends GuiScreen {
 			searchBox.isEnabled = HMIConfig.overlayEnabled;
 		}
 		if(!HMIConfig.overlayEnabled) {
-			Utils.mc.currentScreen = screen;
+			HMIUtils.mc.currentScreen = screen;
 			hoverItem = null;
 		}
 		HMIConfig.writeConfig();
@@ -859,7 +861,7 @@ public class GuiOverlay extends GuiScreen {
 		ScaledResolution res = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
         int posX = (Mouse.getX() * res.getScaledWidth()) / mc.displayWidth;
         int posY = res.getScaledHeight() - (Mouse.getY() * res.getScaledHeight()) / mc.displayHeight - 1;
-        Utils.preRender();
+        HMIUtils.preRender();
         drawScreen(posX, posY);
         if(mouseOverUI(mc, posX, posY)) {
         	for(; Mouse.next(); handleMouseInput()) { }
@@ -869,7 +871,7 @@ public class GuiOverlay extends GuiScreen {
     		searchBox.mouseClicked(posX, posY, Mouse.getEventButton());
 		}
         handleKeyInput();
-		Utils.postRender();
+		HMIUtils.postRender();
 	}
 
 

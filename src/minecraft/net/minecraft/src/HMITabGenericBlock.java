@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-public class TabGenericBlock extends Tab{
+public class HMITabGenericBlock extends HMITab {
 
 	protected Map recipesComplete;
 	protected ArrayList<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
@@ -16,29 +16,29 @@ public class TabGenericBlock extends Tab{
 	protected int slotOffsetY = -4;
 	private String name;
 	
-	public TabGenericBlock(BaseMod tabCreator, Map recipes, Block tabBlock) {
+	public HMITabGenericBlock(BaseMod tabCreator, Map recipes, Block tabBlock) {
 		this(tabCreator, recipes, 1, 1, tabBlock, 0);
 	}
 	
-	public TabGenericBlock(BaseMod tabCreator, Map recipes, Block tabBlock, String name) {
+	public HMITabGenericBlock(BaseMod tabCreator, Map recipes, Block tabBlock, String name) {
 		this(tabCreator, recipes, 1, 1, tabBlock, 0);
 		this.name = name;
 	}
 	
-	public TabGenericBlock(BaseMod tabCreator, Map recipes, Block tabBlock, int metadata) {
+	public HMITabGenericBlock(BaseMod tabCreator, Map recipes, Block tabBlock, int metadata) {
 		this(tabCreator, recipes, 1, 1, tabBlock, metadata);
 	}
 	
-	public TabGenericBlock(BaseMod tabCreator, Map recipes, int inputSlots, int outputSlots, Block tabBlock, String name) {
+	public HMITabGenericBlock(BaseMod tabCreator, Map recipes, int inputSlots, int outputSlots, Block tabBlock, String name) {
 		this(tabCreator, recipes, inputSlots, outputSlots, tabBlock, 0);
 		this.name = name;
 	}
 	
-	public TabGenericBlock(BaseMod tabCreator, Map recipes, int inputSlots, int outputSlots, Block tabBlock, int metadata) {
+	public HMITabGenericBlock(BaseMod tabCreator, Map recipes, int inputSlots, int outputSlots, Block tabBlock, int metadata) {
 		this(tabCreator, inputSlots, outputSlots, recipes, 140, Math.max(42, Math.max(inputSlots * 18 + 4, outputSlots * 18 + 4)), 3, 3, tabBlock, metadata);
 	}
 	
-	public TabGenericBlock(BaseMod tabCreator, int inputSlots, int outputSlots, Map recipes, int width, int height, int minPaddingX, int minPaddingY, Block tabBlock, int metadata) {
+	public HMITabGenericBlock(BaseMod tabCreator, int inputSlots, int outputSlots, Map recipes, int width, int height, int minPaddingX, int minPaddingY, Block tabBlock, int metadata) {
 		super(tabCreator, inputSlots + outputSlots, width, height, minPaddingX, minPaddingY);
 		this.tabBlock = tabBlock;
 		this.metadata = metadata;
@@ -158,16 +158,16 @@ public class TabGenericBlock extends Tab{
 
 	public void draw(int x, int y, int recipeOnThisPageIndex, int cursorX, int cursorY) {
 		drawSlotsAndArrows(x, y);
-		Utils.drawScaledItem(getBlockToDraw(), x + WIDTH / 2 - 20, y + HEIGHT / 2 - 19, 40);
+		HMIUtils.drawScaledItem(getBlockToDraw(), x + WIDTH / 2 - 20, y + HEIGHT / 2 - 19, 40);
 	}
 	
 	protected void drawSlotsAndArrows(int x, int y) {
-		Utils.bindTexture();
+		HMIUtils.bindTexture();
 		for (Integer[] slotCoords: slots) {
-			Utils.drawSlot(x + slotCoords[0] + slotOffsetX, y + slotCoords[1] + slotOffsetY);
+			HMIUtils.drawSlot(x + slotCoords[0] + slotOffsetX, y + slotCoords[1] + slotOffsetY);
 		}
-		Utils.drawArrow(x + 23, y + HEIGHT / 2 - 12);
-		Utils.drawArrow(x + 92, y + HEIGHT / 2 - 12);
+		HMIUtils.drawArrow(x + 23, y + HEIGHT / 2 - 12);
+		HMIUtils.drawArrow(x + 92, y + HEIGHT / 2 - 12);
 	}
 	
 	public String name() {

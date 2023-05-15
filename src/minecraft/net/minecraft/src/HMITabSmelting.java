@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class TabSmelting extends TabWithTexture {
+public class HMITabSmelting extends HMITabWithTexture {
 
 	protected Map recipesComplete;
 	protected ArrayList<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
@@ -14,7 +14,7 @@ public class TabSmelting extends TabWithTexture {
 	private int metadata;
 	private boolean damagedFurnaceInput = false;
 	
-	public TabSmelting(BaseMod tabCreator) {
+	public HMITabSmelting(BaseMod tabCreator) {
 		this(tabCreator, new HashMap(), new ArrayList<ItemStack>(), "/gui/furnace.png", Block.stoneOvenIdle);
 		
 		recipesComplete = FurnaceRecipes.smelting().func_25194_b();
@@ -45,22 +45,22 @@ public class TabSmelting extends TabWithTexture {
         }
 	}
 	
-	public TabSmelting(BaseMod tabCreator, Map recipes, ArrayList<ItemStack> fuels, String texturePath, Block tabBlock) {
+	public HMITabSmelting(BaseMod tabCreator, Map recipes, ArrayList<ItemStack> fuels, String texturePath, Block tabBlock) {
 		this(tabCreator, recipes, fuels, texturePath, tabBlock, 0);
 	}
 	
-	public TabSmelting(BaseMod tabCreator, Map recipes, ArrayList<ItemStack> fuels, String texturePath, Block tabBlock, int metadata) {
+	public HMITabSmelting(BaseMod tabCreator, Map recipes, ArrayList<ItemStack> fuels, String texturePath, Block tabBlock, int metadata) {
 		this(tabCreator, 3, recipes, fuels, texturePath, 84, 56, 54, 15, tabBlock, metadata);
 	}
 	
-	public TabSmelting(BaseMod tabCreator, int slotsPerRecipe, Map recipes, ArrayList<ItemStack> fuels, String texturePath, int width, int height, int textureX, int textureY, Block tabBlock, int metadata) {
+	public HMITabSmelting(BaseMod tabCreator, int slotsPerRecipe, Map recipes, ArrayList<ItemStack> fuels, String texturePath, int width, int height, int textureX, int textureY, Block tabBlock, int metadata) {
 		this(tabCreator, slotsPerRecipe, texturePath, width, height, textureX, textureY, tabBlock, metadata);
 		
 		this.recipesComplete = recipes;
 		this.fuels = fuels;
 	}
 	
-	public TabSmelting(BaseMod tabCreator, int slotsPerRecipe, String texturePath, int width, int height, int textureX, int textureY, Block tabBlock, int metadata) {
+	public HMITabSmelting(BaseMod tabCreator, int slotsPerRecipe, String texturePath, int width, int height, int textureX, int textureY, Block tabBlock, int metadata) {
 		super(tabCreator, slotsPerRecipe, texturePath, width, height, 3, 3, textureX, textureY);
 		
 		this.tabBlock = tabBlock;

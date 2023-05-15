@@ -13,21 +13,21 @@ import java.util.ArrayList;
 //            GuiContainer, CraftingInventoryRecipeBookCB, InventoryRecipeBook, FontRenderer, 
 //            RenderEngine
 
-public class GuiRecipeViewer extends GuiContainer
+public class HMIGuiRecipeViewer extends GuiContainer
 {
-	private static Field xSizeField = Utils.getField(GuiContainer.class, new String[] {"xSize", "a"});
+	private static Field xSizeField = HMIUtils.getField(GuiContainer.class, new String[] {"xSize", "a"});
     
-	public GuiRecipeViewer(ItemStack itemstack, Boolean getUses, GuiScreen parent)
+	public HMIGuiRecipeViewer(ItemStack itemstack, Boolean getUses, GuiScreen parent)
     {
-		super(container = new ContainerRecipeViewer(inv = new InventoryRecipeViewer(itemstack)));
+		super(container = new HMIContainerRecipeViewer(inv = new HMIInventoryRecipeViewer(itemstack)));
 		this.parent = parent;
 		init();
         push(itemstack, getUses);
     }
 	
-	public GuiRecipeViewer(ItemStack itemstack, GuiScreen parent)
+	public HMIGuiRecipeViewer(ItemStack itemstack, GuiScreen parent)
     {
-		super(container = new ContainerRecipeViewer(inv = new InventoryRecipeViewer(itemstack)));
+		super(container = new HMIContainerRecipeViewer(inv = new HMIInventoryRecipeViewer(itemstack)));
 		this.parent = parent;
 		init();
         pushTabBlock(itemstack);
@@ -65,7 +65,7 @@ public class GuiRecipeViewer extends GuiContainer
 		inv.prevPages.push(inv.getPage()*inv.currentTab.recipesPerPage);
 		inv.prevGetUses.push(true);
 		
-		for (Tab tab : mod_HowManyItems.getTabs()) {
+		for (HMITab tab : mod_HowManyItems.getTabs()) {
 			boolean tabMatchesBlock = false;
 			for(ItemStack tabBlock : tab.equivalentCraftingStations) {
 				if(tabBlock.isItemEqual(itemstack)) {
@@ -102,7 +102,7 @@ public class GuiRecipeViewer extends GuiContainer
     		inv.prevGetUses.push(getUses);
 
     		inv.newList = true;
-    		for (Tab tab : mod_HowManyItems.getTabs()) {
+    		for (HMITab tab : mod_HowManyItems.getTabs()) {
     			tab.updateRecipes(inv.filter.peek(), getUses);
     		}
     		postPush();
@@ -112,7 +112,7 @@ public class GuiRecipeViewer extends GuiContainer
 	
 	private void postPush() {
 		if (inv.currentTab.size == 0) {
-			for (Tab tab : mod_HowManyItems.getTabs()) {
+			for (HMITab tab : mod_HowManyItems.getTabs()) {
     			if(tab.size > 0) {
     				newTab(tab);
     				break;
@@ -127,7 +127,7 @@ public class GuiRecipeViewer extends GuiContainer
     					return;
     				}
     				else
-    				for (Tab tab2 : mod_HowManyItems.getTabs()) {
+    				for (HMITab tab2 : mod_HowManyItems.getTabs()) {
     					
     	    			tab2.updateRecipes(inv.filter.peek(), inv.prevGetUses.peek());
     	    		}
@@ -153,7 +153,7 @@ public class GuiRecipeViewer extends GuiContainer
 			return;
 		}
 		else {
-			for (Tab tab : mod_HowManyItems.getTabs()) {
+			for (HMITab tab : mod_HowManyItems.getTabs()) {
     			tab.updateRecipes(inv.filter.peek(), inv.prevGetUses.peek());
     		}
     		newTab(inv.prevTabs.pop());
@@ -203,7 +203,7 @@ public class GuiRecipeViewer extends GuiContainer
     	super.mouseClicked(posX, posY, k);
     	int x = (width - xSize) / 2;
     	int y = (height - ySize) / 2;
-    	ItemStack item = Utils.hoveredItem(this, posX, posY);
+    	ItemStack item = HMIUtils.hoveredItem(this, posX, posY);
     	if(item != null && mc.thePlayer.inventory.getItemStack() == null) {
     		push(item, k == 1);
     	}
@@ -239,7 +239,7 @@ public class GuiRecipeViewer extends GuiContainer
     	}
     }
     
-    public void newTab(Tab tab) {
+    public void newTab(HMITab tab) {
     	tabIndex = tabs.indexOf(tab);
     	tab.redrawSlots = true;
 		inv.initTab(tab);
@@ -289,8 +289,8 @@ public class GuiRecipeViewer extends GuiContainer
             guibutton.drawButton(mc, cursorPosX, cursorPosY);
         }
         
-        if(tabs.get(tabIndex) instanceof TabWithTexture) {
-        	TabWithTexture tab = (TabWithTexture)tabs.get(tabIndex);
+        if(tabs.get(tabIndex) instanceof HMITabWithTexture) {
+        	HMITabWithTexture tab = (HMITabWithTexture)tabs.get(tabIndex);
         	int gapX = (xSize - 2*EDGE_SIZE) % (tab.WIDTH + tab.MIN_PADDING_X);
         	int noX = (xSize - 2*EDGE_SIZE) / (tab.WIDTH + tab.MIN_PADDING_X);
         	if (noX == 0) noX++;
@@ -314,7 +314,7 @@ public class GuiRecipeViewer extends GuiContainer
         				int posY = EDGE_SIZE + gapY/4 + i2*(ySize - gapY/2)/noY;
         				if(noX == 1) posX = (xSize - tab.WIDTH)/2;
         				if(noY == 1) posY = (ySize - tab.HEIGHT)/2;
-        				GuiButtonHMI button = new GuiButtonHMI(i, x + posX + tab.BUTTON_POS_X, y + posY + tab.BUTTON_POS_Y, BUTTON_WIDTH, BUTTON_HEIGHT, "+");
+        				HMIGuiButton button = new HMIGuiButton(i, x + posX + tab.BUTTON_POS_X, y + posY + tab.BUTTON_POS_Y, BUTTON_WIDTH, BUTTON_HEIGHT, "+");
         				Boolean[] itemsInInv = tab.itemsInInventory(parent, inv.items[i - 1]);
         				for (int qq = 0; qq < itemsInInv.length; qq++) {
         					if (!itemsInInv[qq]) {
@@ -344,9 +344,9 @@ public class GuiRecipeViewer extends GuiContainer
     		if (tabPage < 0) tabPage = 0;
     	}
     	else {
-    		if(guibutton.id - 1 < inv.items.length && tabs.get(tabIndex) instanceof TabWithTexture) {
+    		if(guibutton.id - 1 < inv.items.length && tabs.get(tabIndex) instanceof HMITabWithTexture) {
     			displayParent();
-    			((TabWithTexture)tabs.get(tabIndex)).setupRecipe(parent, inv.items[guibutton.id - 1]);
+    			((HMITabWithTexture)tabs.get(tabIndex)).setupRecipe(parent, inv.items[guibutton.id - 1]);
     		}
     	}
     	
@@ -354,7 +354,7 @@ public class GuiRecipeViewer extends GuiContainer
     
     public void displayParent() {
     	//if (parent instanceof GuiInventory) {
-    		mc = Utils.mc;
+    		mc = HMIUtils.mc;
 			mc.thePlayer.craftingInventory = mc.thePlayer.inventorySlots;
 		//}
 			this.onGuiClosed();
@@ -398,15 +398,15 @@ public class GuiRecipeViewer extends GuiContainer
     				String s2 = (tabs.get(z).name());
     	            if(s2.length() > 0)
     	            {
-    	            	Utils.drawTooltip(s2, cursorPosX, cursorPosY);
+    	            	HMIUtils.drawTooltip(s2, cursorPosX, cursorPosY);
     	            }
         			break;
         		}
     			tabCount++;
     		}
     	}
-        if(tabs.get(tabIndex) instanceof TabWithTexture) {
-        	TabWithTexture tab = (TabWithTexture)tabs.get(tabIndex);
+        if(tabs.get(tabIndex) instanceof HMITabWithTexture) {
+        	HMITabWithTexture tab = (HMITabWithTexture)tabs.get(tabIndex);
         	y += 3;
             int gapX = (xSize - 2*EDGE_SIZE) % (tab.WIDTH + tab.MIN_PADDING_X);
             int noX = (xSize - 2*EDGE_SIZE) / (tab.WIDTH + tab.MIN_PADDING_X);
@@ -452,8 +452,8 @@ public class GuiRecipeViewer extends GuiContainer
                }
             }
         }
-        Utils.postRender();
-        Utils.disableLighting();
+        HMIUtils.postRender();
+        HMIUtils.disableLighting();
     }
     
     public ItemStack getHoverItem() {
@@ -480,7 +480,7 @@ public class GuiRecipeViewer extends GuiContainer
     
     protected void drawGuiContainerBackgroundLayer(float f)
     {
-    	Utils.preRender();
+    	HMIUtils.preRender();
     	int x = (width - xSize) / 2;
         int y = (height - ySize) / 2 + 3;
         
@@ -491,17 +491,17 @@ public class GuiRecipeViewer extends GuiContainer
         for (int z = tabPage; z < tabs.size(); z++) {
         	if(tabs.get(z).size > 0) {
         		if (z != tabIndex && (tabCount+1)*TAB_WIDTH < xSize) {
-        			Utils.bindTexture();
-        	        Utils.disableLighting();
+        			HMIUtils.bindTexture();
+        	        HMIUtils.disableLighting();
         			drawTexturedModalRect(x + tabCount*TAB_WIDTH, y -25, 28, 113, 28, 28);
-        			Utils.drawItemStack(x + 6 + tabCount*TAB_WIDTH, y -18, tabs.get(z).getTabItem(), true);
+        			HMIUtils.drawItemStack(x + 6 + tabCount*TAB_WIDTH, y -18, tabs.get(z).getTabItem(), true);
         		}
         		tabCount++;
         	}
         }
         //DRAW BACKGROUND
-        Utils.bindTexture();
-        Utils.disableLighting();
+        HMIUtils.bindTexture();
+        HMIUtils.disableLighting();
         for(int l1 = 0; l1 < xSize - EDGE_SIZE; l1+= 48)
         {
             for(int i2 = 0; i2 < ySize - EDGE_SIZE; i2+= 48)
@@ -560,20 +560,20 @@ public class GuiRecipeViewer extends GuiContainer
         for (int z = tabPage; z < tabs.size(); z++) {
         	if (tabs.get(z).size > 0) {
         		if (z == tabIndex && (tabCount+1)*TAB_WIDTH < xSize) {
-        			Utils.bindTexture();
-        	        Utils.disableLighting();
+        			HMIUtils.bindTexture();
+        	        HMIUtils.disableLighting();
         			drawTexturedModalRect(x + tabCount*TAB_WIDTH, y -25, 0, 113, 28, 28);
         			if(tabCount == 0) {
         				drawTexturedModalRect(x, y, 0, 145, EDGE_SIZE, 5);
         			}
-        			Utils.drawItemStack(x + 6 + tabCount*TAB_WIDTH, y -18, tabs.get(z).getTabItem(), true);
+        			HMIUtils.drawItemStack(x + 6 + tabCount*TAB_WIDTH, y -18, tabs.get(z).getTabItem(), true);
         		}
         		tabCount++;
         	}
         }
         
-        Utils.bindTexture();
-        Utils.disableLighting();
+        HMIUtils.bindTexture();
+        HMIUtils.disableLighting();
         //DRAW dragging indicator thing
         if (HMIConfig.recipeViewerDraggableGui) {
             drawTexturedModalRect(x + xSize - 29, y + ySize - 29, 56, 169, 28, 28);
@@ -581,7 +581,7 @@ public class GuiRecipeViewer extends GuiContainer
         
         //DRAW RECIPE CONTAINER
        
-        	Tab tab = tabs.get(tabIndex);
+        	HMITab tab = tabs.get(tabIndex);
         	
         	 
         	int gapX = (xSize - 2*EDGE_SIZE) % (tab.WIDTH + tab.MIN_PADDING_X);
@@ -662,9 +662,9 @@ public class GuiRecipeViewer extends GuiContainer
     private GuiScreen parent;
     private int tabIndex;
     private RenderItem itemRenderer = new RenderItem();
-    public static ArrayList<Tab> tabs;
-    private static InventoryRecipeViewer inv;
-    private static ContainerRecipeViewer container;
+    public static ArrayList<HMITab> tabs;
+    private static HMIInventoryRecipeViewer inv;
+    private static HMIContainerRecipeViewer container;
 
 
 	

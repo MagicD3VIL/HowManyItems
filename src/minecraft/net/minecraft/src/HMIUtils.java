@@ -6,10 +6,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class Utils {
+public class HMIUtils {
 	private static ArrayList<ItemStack> allItems;
-	private static Method getSlotAtPositionMethod = getMethod(GuiContainer.class, new String[] {"getSlotAtPosition", "a"}, new Class<?>[] {int.class, int.class});
-	private static Method drawGradientRectMethod = getMethod(Gui.class, new String[] {"drawGradientRect", "a"}, new Class<?>[] {int.class, int.class, int.class, int.class, int.class, int.class});
+	private static final Method getSlotAtPositionMethod = getMethod(GuiContainer.class, new String[] {"getSlotAtPosition", "a"}, new Class<?>[] {int.class, int.class});
+	private static final Method drawGradientRectMethod = getMethod(Gui.class, new String[] {"drawGradientRect", "a"}, new Class<?>[] {int.class, int.class, int.class, int.class, int.class, int.class});
 	public static RenderItem itemRenderer = new RenderItem();
 	public static Random rand = new Random();
 	public static Gui gui = new Gui();
@@ -17,7 +17,7 @@ public class Utils {
 	
 	//clean mine_diver code
 	//Used for easy reflection with obfuscated or regular fields
-	public static final Field getField(Class<?> target, String names[]) {
+	public static Field getField(Class<?> target, String names[]) {
 		for (Field field : target.getDeclaredFields()) {
 			for (String name : names) {
 				if (field.getName() == name) {
@@ -31,29 +31,37 @@ public class Utils {
 	
 	//clean mine_diver code
 	//Used for easy reflection with obfuscated or regular methods
-	public static final Method getMethod(Class<?> target, String names[], Class<?> types[]) {
+	public static Method getMethod(Class<?> target, String names[], Class<?> types[]) {
 		for (String name : names) {
 			try {
 				Method method = target.getDeclaredMethod(name, types);
 				method.setAccessible(true);
 				return method;
 			}  
-			catch (NoSuchMethodException e) { /* Do nothing */}
+			catch (NoSuchMethodException ignored) { }
         }
         return null;
     }
 	
 	//Returns the translated name of an itemstack with its ID if config allows and ID is wanted
 	public static String getNiceItemName(ItemStack item, boolean withID) {
-		String s = StringTranslate.getInstance().translateNamedKey(item.getItem().getItemName());
-		if(s == null || s.length() == 0) {
-			s = item.getItem().getItemName();
-			if(s == null) s = "null";
+		// TODO: Changed to work better with sub-items
+		// String s = StringTranslate.getInstance().translateNamedKey(item.getItem().getItemName());
+		String itemName = item.getItem().getItemName();
+		String s;
+
+		try {
+			s = (new StringBuilder()).append("").append(StringTranslate.getInstance().translateNamedKey(item.func_20109_f())).toString().trim();
+		} catch (Exception e) {
+			s = itemName;
 		}
+		if (s == null || s.length() == 0) s = "";
+
 		if(HMIConfig.showItemIDs && withID) {
 			s += " " + item.itemID;
 			if(item.getHasSubtypes()) s+= ":" + item.getItemDamage();
 		}
+
 		return s;
 	}
 	
@@ -75,69 +83,64 @@ public class Utils {
 	//Returns the list of all blocks and items (that I can find)
 	public static ArrayList<ItemStack> itemList() {
 		if(allItems == null) {
-;			allItems = new ArrayList<ItemStack>();
+;			allItems = new ArrayList<>();
 			
 			Item mcItemsList[] = Item.itemsList;
-	        for(int j = 0; j < mcItemsList.length; j++)
-	        {
-	            Item item = mcItemsList[j];
-	            if(item == null)
-	            {
-	                continue;
-	            }
-	            HashSet<String> currentItemNames = new HashSet<String>();
-	            for(int dmg = 0;; dmg++)
-	            {
-	                ItemStack itemstack = new ItemStack(item, 1, dmg);
-	                for(ItemStack hiddenItem : GuiOverlay.hiddenItems) {
-	                	if(itemstack.isItemEqual(hiddenItem)) {
-	                		itemstack = hiddenItem;
-	                		break;
-	                	}
-	                }
-	                try
-	                {
-	                    int l = item.getIconIndex(itemstack);
-	                    String s = (new StringBuilder()).append(StringTranslate.getInstance().translateNamedKey(itemstack.getItem().getItemName())).toString();
-	                    if(s.length() == 0) s = (new StringBuilder()).append(itemstack.getItem().getItemName()).append("@").append(l).toString();
-	                    if(dmg >= 4 && (s.contains(String.valueOf(dmg)) || s.contains(String.valueOf(dmg + 1)) || s.contains(String.valueOf(dmg - 1)))){
-	                    	break;
-	                    }
-	                    s = (new StringBuilder(s)).append("@").append(l).toString();
-	                    //System.out.println(s);
-	                    if(!currentItemNames.contains(s))
-	                    {
-	                        allItems.add(itemstack);
-	                        currentItemNames.add(s);
-	                        continue;
-	                    }
-	                    else {
-	                    	break;
-	                    }
-	                }
-	                catch(NullPointerException nullpointerexception) { }
-	                catch(IndexOutOfBoundsException indexoutofboundsexception) { }
-	                break;
-	            }
-	        }
+			for (Item item : mcItemsList) {
+				if (item == null) {
+					continue;
+				}
+				HashSet<String> currentItemNames = new HashSet<>();
+				for (int dmg = 0; ; dmg++) {
+					ItemStack itemstack = new ItemStack(item, 1, dmg);
+					for (ItemStack hiddenItem : HMIGuiOverlay.hiddenItems) {
+						if (itemstack.isItemEqual(hiddenItem)) {
+							itemstack = hiddenItem;
+							break;
+						}
+					}
+					try {
+						String s = getNiceItemName(itemstack, false);
+						/* TODO: Changed to use the method we created instead of duplicate code...
+						int l = item.getIconIndex(itemstack);
+						String s = (new StringBuilder()).append(StringTranslate.getInstance().translateNamedKey(itemstack.getItem().getItemName())).toString();
+						if (s.length() == 0)
+							s = (new StringBuilder()).append(itemstack.getItem().getItemName()).append("@").append(l).toString();
+						if (dmg >= 4 && (s.contains(String.valueOf(dmg)) || s.contains(String.valueOf(dmg + 1)) || s.contains(String.valueOf(dmg - 1)))) {
+							break;
+						}
+						s = (new StringBuilder(s)).append("@").append(l).toString();
+						//System.out.println(s);
+						*/
+						if (!currentItemNames.contains(s)) {
+							allItems.add(itemstack);
+							currentItemNames.add(s);
+							continue;
+						} else {
+							break;
+						}
+					} catch (NullPointerException | IndexOutOfBoundsException ignored) {
+					}
+					break;
+				}
+			}
 	        
 	        List recipes = CraftingManager.getInstance().func_25193_b();
-	        recipeLoop : for(Iterator iterator = recipes.iterator(); iterator.hasNext();)
-	        {
-	            IRecipe irecipe = (IRecipe)iterator.next();
-	            ItemStack itemstack = new ItemStack(irecipe.func_25117_b().getItem(), 1, irecipe.func_25117_b().getItemDamage());
-                for(ItemStack hiddenItem : GuiOverlay.hiddenItems) {
-                	if(itemstack.isItemEqual(hiddenItem)) {
-                		itemstack = hiddenItem;
-                		break;
-                	}
-                }
-	            if(!itemstack.getHasSubtypes()) {
-	            	continue recipeLoop;
-	            }
-	            addItemInOrder(allItems, itemstack);
-	           
-	        }			
+			for (Object recipe : recipes) {
+				IRecipe irecipe = (IRecipe) recipe;
+				ItemStack itemstack = new ItemStack(irecipe.func_25117_b().getItem(), 1, irecipe.func_25117_b().getItemDamage());
+				for (ItemStack hiddenItem : HMIGuiOverlay.hiddenItems) {
+					if (itemstack.isItemEqual(hiddenItem)) {
+						itemstack = hiddenItem;
+						break;
+					}
+				}
+				if (!itemstack.getHasSubtypes()) {
+					continue;
+				}
+				addItemInOrder(allItems, itemstack);
+
+			}
 		}
 		return allItems;
 	}
@@ -181,7 +184,7 @@ public class Utils {
 	//Returns the number of enabled tabs
 	public static int visibleTabSize() {
 		int largestIndex = -1;
-		for(Tab tab : mod_HowManyItems.allTabs) {
+		for(HMITab tab : mod_HowManyItems.allTabs) {
 			if(tab.index > largestIndex)
 				largestIndex = tab.index;
 		}
@@ -272,9 +275,9 @@ public class Utils {
 	public static void drawItemStack(int x, int y, ItemStack item, boolean drawOverlay) {
 		localTextureBound = false;
 		enableItemLighting();
-		Utils.itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, item, x, y);
+		itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, item, x, y);
 		if(drawOverlay) {
-			Utils.itemRenderer.renderItemOverlayIntoGUI(mc.fontRenderer, mc.renderEngine, item, x, y);
+			HMIUtils.itemRenderer.renderItemOverlayIntoGUI(mc.fontRenderer, mc.renderEngine, item, x, y);
 		}
 	}
 	

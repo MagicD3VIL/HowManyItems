@@ -1,8 +1,8 @@
 package net.minecraft.src;
 
-public class GuiTextFieldHMI extends GuiTextField {
+public class HMIGuiTextField extends GuiTextField {
 
-	public GuiTextFieldHMI(GuiScreen guiscreen, FontRenderer fontrenderer, int i, int j, int k, int l, String s) {
+	public HMIGuiTextField(GuiScreen guiscreen, FontRenderer fontrenderer, int i, int j, int k, int l, String s) {
 		super(guiscreen, fontrenderer, i, j, k, l, s);
 		xPos = i;
         yPos = j;

@@ -2,9 +2,9 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 
-public abstract class Tab {
+public abstract class HMITab {
 	
-	public Tab(BaseMod tabCreator, int slotsPerRecipe, int width, int height, int minPaddingX, int minPaddingY) {
+	public HMITab(BaseMod tabCreator, int slotsPerRecipe, int width, int height, int minPaddingX, int minPaddingY) {
 		slots = new Integer[slotsPerRecipe][];
 		WIDTH = width;
 		HEIGHT = height;

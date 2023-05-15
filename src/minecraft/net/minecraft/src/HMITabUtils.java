@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TabUtils {
+public class HMITabUtils {
 
-	public static void loadTabs(ArrayList<Tab> tabList, BaseMod mod) {
-		TabCrafting workbenchTab = new TabCrafting(mod);
+	public static void loadTabs(ArrayList<HMITab> tabList, BaseMod mod) {
+		HMITabCrafting workbenchTab = new HMITabCrafting(mod);
 		tabList.add(workbenchTab);
 		guiToBlock.put(GuiCrafting.class, new ItemStack(Block.workbench));
 		
-		Tab smeltingTab = new TabSmelting(mod);
+		HMITab smeltingTab = new HMITabSmelting(mod);
 		tabList.add(smeltingTab);
 		smeltingTab.equivalentCraftingStations.add(new ItemStack(Block.stoneOvenActive));
 		guiToBlock.put(GuiFurnace.class, new ItemStack(Block.stoneOvenIdle));

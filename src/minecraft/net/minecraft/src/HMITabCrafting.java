@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TabCrafting extends TabWithTexture {
+public class HMITabCrafting extends HMITabWithTexture {
 
 	protected List recipesComplete;
 	protected List recipes;
@@ -15,7 +15,7 @@ public class TabCrafting extends TabWithTexture {
 	private boolean isVanillaWorkbench = false; //THIS IS LAZY
 	public ArrayList<Class<? extends GuiContainer>> guiCraftingStations = new ArrayList<Class<? extends GuiContainer>>();
 	
-	public TabCrafting(BaseMod tabCreator) {
+	public HMITabCrafting(BaseMod tabCreator) {
 		this(tabCreator, new ArrayList(CraftingManager.getInstance().func_25193_b()), Block.workbench);
 		for (int i = 0; i < recipesComplete.size(); i++) {
 			//Removes recipes that are too big and ruin everything @flans mod
@@ -29,12 +29,12 @@ public class TabCrafting extends TabWithTexture {
 		guiCraftingStations.add(GuiCrafting.class);
 	}
 	
-	public TabCrafting(BaseMod tabCreator, List recipesComplete, Block tabBlock) {
+	public HMITabCrafting(BaseMod tabCreator, List recipesComplete, Block tabBlock) {
 		this(tabCreator, 10, recipesComplete, tabBlock, "/gui/crafting.png", 118, 56, 28, 15, 56, 46, 3);
 		slots[0] = new Integer[]{96, 23};
 	}
 
-	public TabCrafting(BaseMod tabCreator, int slotsPerRecipe, List recipesComplete, Block tabBlock, String texturePath, int width, int height, int textureX, int textureY, int buttonX, int buttonY, int slotsWidth) {
+	public HMITabCrafting(BaseMod tabCreator, int slotsPerRecipe, List recipesComplete, Block tabBlock, String texturePath, int width, int height, int textureX, int textureY, int buttonX, int buttonY, int slotsWidth) {
 		super(tabCreator, slotsPerRecipe, texturePath, width, height, 3, 4, textureX, textureY, buttonX, buttonY);
 		this.slotsWidth = slotsWidth;
 		this.recipesComplete = recipesComplete;
@@ -229,7 +229,7 @@ public class TabCrafting extends TabWithTexture {
 		if (parent instanceof GuiContainer)
 			list = ((GuiContainer)parent).inventorySlots.slots;
 		else
-			list = Utils.mc.thePlayer.inventorySlots.slots;
+			list = HMIUtils.mc.thePlayer.inventorySlots.slots;
         ItemStack aslot[] = new ItemStack[list.size()];
         for(int i = 0; i < list.size(); i++)
         {
@@ -311,13 +311,13 @@ public class TabCrafting extends TabWithTexture {
 	public void setupRecipe(GuiScreen parent, ItemStack[] recipeItems) {
 		List list;
 		if (parent == null) {
-			Utils.mc.setIngameNotInFocus();
-			ScaledResolution scaledresolution = new ScaledResolution(Utils.mc.gameSettings, Utils.mc.displayWidth, Utils.mc.displayHeight);
+			HMIUtils.mc.setIngameNotInFocus();
+			ScaledResolution scaledresolution = new ScaledResolution(HMIUtils.mc.gameSettings, HMIUtils.mc.displayWidth, HMIUtils.mc.displayHeight);
 			int i = scaledresolution.getScaledWidth();
 			int j = scaledresolution.getScaledHeight();
-			parent = new GuiInventory(Utils.mc.thePlayer);
-			Utils.mc.currentScreen = parent;
-			parent.setWorldAndResolution(Utils.mc, i, j);
+			parent = new GuiInventory(HMIUtils.mc.thePlayer);
+			HMIUtils.mc.currentScreen = parent;
+			parent.setWorldAndResolution(HMIUtils.mc, i, j);
 		}
 		list = ((GuiContainer)parent).inventorySlots.slots;
 		

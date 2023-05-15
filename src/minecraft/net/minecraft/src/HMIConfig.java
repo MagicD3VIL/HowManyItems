@@ -37,15 +37,15 @@ public class HMIConfig {
 				configWriter.write(System.getProperty("line.separator") + "key_" + keybind.keyDescription + ":" + keybind.keyCode);
 			}
 			configWriter.write(System.getProperty("line.separator") + "hiddenItems=");
-			for(int i = 0; i < GuiOverlay.hiddenItems.size(); i++) {
+			for(int i = 0; i < HMIGuiOverlay.hiddenItems.size(); i++) {
 				if(i > 0) configWriter.write(",");
-				ItemStack item = GuiOverlay.hiddenItems.get(i);
+				ItemStack item = HMIGuiOverlay.hiddenItems.get(i);
 				configWriter.write(String.valueOf(item.itemID));
 				if(item.getHasSubtypes()) {
 					configWriter.write(":" + String.valueOf(item.getItemDamage()));
 					int meta = item.getItemDamage();
-					for(int q = i + 1; q < GuiOverlay.hiddenItems.size() && GuiOverlay.hiddenItems.get(q).itemID == item.itemID; q++) {
-						if(++meta == GuiOverlay.hiddenItems.get(q).getItemDamage()) {
+					for(int q = i + 1; q < HMIGuiOverlay.hiddenItems.size() && HMIGuiOverlay.hiddenItems.get(q).itemID == item.itemID; q++) {
+						if(++meta == HMIGuiOverlay.hiddenItems.get(q).getItemDamage()) {
 							i = q;
 						}
 						else {
@@ -61,14 +61,14 @@ public class HMIConfig {
 			if(mod_HowManyItems.allTabs != null) {
 				configWriter.write(System.getProperty("line.separator") + "// Below are the index values for each tab");
 				configWriter.write(System.getProperty("line.separator") + "// Use -1 to disable the tab");
-				for(int i = 0; i < Utils.visibleTabSize(); i++) {
-					for(Tab tab : mod_HowManyItems.allTabs) {
+				for(int i = 0; i < HMIUtils.visibleTabSize(); i++) {
+					for(HMITab tab : mod_HowManyItems.allTabs) {
 						if(tab.index == i) {
 							configWriter.write(System.getProperty("line.separator") + tab.TAB_CREATOR.getClass().getSimpleName() + ":" + tab.name() + ":" + tab.index);
 						}
 					}
 				}
-				for(Tab tab : mod_HowManyItems.allTabs) {
+				for(HMITab tab : mod_HowManyItems.allTabs) {
 					if(tab.index == -1) {
 						configWriter.write(System.getProperty("line.separator") + tab.TAB_CREATOR.getClass().getSimpleName() + ":" + tab.name() + ":" + tab.index);
 					}
@@ -102,8 +102,8 @@ public class HMIConfig {
 					}
 				}
 				else if(s.startsWith("hiddenItems=")) {
-					if(GuiOverlay.hiddenItems == null) {
-						GuiOverlay.hiddenItems = new ArrayList<ItemStack>();
+					if(HMIGuiOverlay.hiddenItems == null) {
+						HMIGuiOverlay.hiddenItems = new ArrayList<ItemStack>();
 						String as[] = s.replaceFirst("hiddenItems=", "").split(",");
 						for(int i = 0; i < as.length; i++) {
 							if(as[i].contains(":")) {
@@ -113,15 +113,15 @@ public class HMIConfig {
 									int minmeta = Integer.parseInt(meta[0]);
 									int maxmeta = Integer.parseInt(meta[1]);
 									for(int q = minmeta; q <= maxmeta; q++) {
-										GuiOverlay.hiddenItems.add(new ItemStack(Integer.parseInt(as2[0]), 1, q));
+										HMIGuiOverlay.hiddenItems.add(new ItemStack(Integer.parseInt(as2[0]), 1, q));
 										if(minmeta > maxmeta) break;
 									}
 									
 								}
-								else GuiOverlay.hiddenItems.add(new ItemStack(Integer.parseInt(as2[0]), 1, Integer.parseInt(as2[1])));
+								else HMIGuiOverlay.hiddenItems.add(new ItemStack(Integer.parseInt(as2[0]), 1, Integer.parseInt(as2[1])));
 							}
 							else if(as[i].length() > 0){
-								GuiOverlay.hiddenItems.add(new ItemStack(Integer.parseInt(as[i]), 1, 0));
+								HMIGuiOverlay.hiddenItems.add(new ItemStack(Integer.parseInt(as[i]), 1, 0));
 							}
 						}
 					}
@@ -148,7 +148,7 @@ public class HMIConfig {
 				}
 				else if (s.contains(":") && mod_HowManyItems.allTabs != null) {
 					String as[] = s.split(":");
-					for(Tab tab : mod_HowManyItems.allTabs) {
+					for(HMITab tab : mod_HowManyItems.allTabs) {
 						if(tab.TAB_CREATOR.getClass().getSimpleName().equalsIgnoreCase(as[0]) 
 								&& tab.name().equalsIgnoreCase(as[1])) {
 							//TODO tab name
@@ -163,10 +163,10 @@ public class HMIConfig {
 		}
 	}
     
-    public static ArrayList<Tab> orderTabs() {
-    	ArrayList<Tab> orderedTabs = new ArrayList<Tab>();
+    public static ArrayList<HMITab> orderTabs() {
+    	ArrayList<HMITab> orderedTabs = new ArrayList<HMITab>();
     	for(int i = 0; i < mod_HowManyItems.allTabs.size(); i++) {
-    		Tab tab = mod_HowManyItems.allTabs.get(i);
+    		HMITab tab = mod_HowManyItems.allTabs.get(i);
     		while(orderedTabs.size() < tab.index + 1)
 				orderedTabs.add(null);
     		if(tab.index >= 0) {
@@ -178,7 +178,7 @@ public class HMIConfig {
     		orderedTabs.get(i).index = i;
 		}
     	for(int i = 0; i < mod_HowManyItems.allTabs.size(); i++) {
-    		Tab tab = mod_HowManyItems.allTabs.get(i);
+    		HMITab tab = mod_HowManyItems.allTabs.get(i);
     		if(tab.index == -2) {
     			tab.index = orderedTabs.size();
     			orderedTabs.add(tab);
@@ -191,9 +191,9 @@ public class HMIConfig {
     	return orderedTabs;
 	}
     
-    public static void tabOrderChanged(boolean[] tabEnabled, Tab[] tabOrder) {
+    public static void tabOrderChanged(boolean[] tabEnabled, HMITab[] tabOrder) {
     	for(int i = 0; i < mod_HowManyItems.allTabs.size(); i++) {
-    		Tab tab = mod_HowManyItems.allTabs.get(i);
+    		HMITab tab = mod_HowManyItems.allTabs.get(i);
     		for(int j = 0; j < tabOrder.length; j++) {
     			if(tab.equals(tabOrder[j])) {
     				tab.index = j;
@@ -221,8 +221,6 @@ public class HMIConfig {
 	public static String mpTimeNightCommand = "/time set 13000";
 	public static String mpRainONCommand = "";
 	public static String mpRainOFFCommand = "";
-	public static String mpGamemodeCCommand = "/gamemode 1";
-	public static String mpGamemodeSCommand = "/gamemode 0";
 	
     public static boolean recipeViewerDraggableGui = false;
     
@@ -232,7 +230,7 @@ public class HMIConfig {
     public static KeyBinding pushRecipe = new KeyBinding("Get Recipes", Keyboard.KEY_R);
     public static KeyBinding pushUses = new KeyBinding("Get Uses", Keyboard.KEY_U);
     public static KeyBinding prevRecipe = new KeyBinding("Previous Recipe", Keyboard.KEY_BACK);
-    public static KeyBinding allRecipes = new KeyBinding("Show All Recipes", Keyboard.KEY_NONE);
+    public static KeyBinding allRecipes = new KeyBinding("Show All Recipes", Keyboard.KEY_HOME);
 
     public static KeyBinding toggleOverlay = new KeyBinding("Toggle HMI", Keyboard.KEY_O);
     public static KeyBinding clearSearchBox = new KeyBinding("Clear Search", Keyboard.KEY_DELETE);

@@ -1,12 +1,12 @@
 package net.minecraft.src;
 
-public abstract class TabWithTexture extends Tab {
+public abstract class HMITabWithTexture extends HMITab {
 
-	public TabWithTexture(BaseMod tabCreator, int slotsPerRecipe, String texturePath, int width, int height, int minPaddingX, int minPaddingY, int textureX, int textureY) {
+	public HMITabWithTexture(BaseMod tabCreator, int slotsPerRecipe, String texturePath, int width, int height, int minPaddingX, int minPaddingY, int textureX, int textureY) {
 		this(tabCreator, slotsPerRecipe, texturePath, width, height, minPaddingX, minPaddingY, textureX, textureY, 0, 0);
 	}
 	
-	public TabWithTexture(BaseMod tabCreator, int slotsPerRecipe, String texturePath, int width, int height, int minPaddingX, int minPaddingY, int textureX, int textureY, int buttonX, int buttonY) {
+	public HMITabWithTexture(BaseMod tabCreator, int slotsPerRecipe, String texturePath, int width, int height, int minPaddingX, int minPaddingY, int textureX, int textureY, int buttonX, int buttonY) {
 		super(tabCreator, slotsPerRecipe, width, height, minPaddingX, minPaddingY);
 		slots = new Integer[slotsPerRecipe][];
 		TEXTURE_PATH = texturePath;
@@ -17,9 +17,9 @@ public abstract class TabWithTexture extends Tab {
 	}
 	
 	public void draw(int x, int y, int recipeOnThisPageIndex, int cursorX, int cursorY) {
-		Utils.bindTexture(TEXTURE_PATH);
-		Utils.disableLighting();
-		Utils.gui.drawTexturedModalRect(x, y, TEXTURE_X, TEXTURE_Y, WIDTH, HEIGHT);
+		HMIUtils.bindTexture(TEXTURE_PATH);
+		HMIUtils.disableLighting();
+		HMIUtils.gui.drawTexturedModalRect(x, y, TEXTURE_X, TEXTURE_Y, WIDTH, HEIGHT);
 	}
 	
 	public Boolean drawSetupRecipeButton(GuiScreen parent, ItemStack[] recipeItems) {

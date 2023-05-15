@@ -8,10 +8,10 @@ package net.minecraft.src;
 //            Container, IInventory, Slot, EntityPlayer, 
 //            ItemStack
 
-public class ContainerRecipeViewer extends Container
+public class HMIContainerRecipeViewer extends Container
 {
 
-    public ContainerRecipeViewer(InventoryRecipeViewer iinventory)
+    public HMIContainerRecipeViewer(HMIInventoryRecipeViewer iinventory)
     {
     	inv = iinventory;
     	resetSlots();
@@ -32,7 +32,7 @@ public class ContainerRecipeViewer extends Container
     }
 
     private int count;
-    private InventoryRecipeViewer inv;
+    private HMIInventoryRecipeViewer inv;
 	
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return true;

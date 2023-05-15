@@ -4,22 +4,22 @@ import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-public class GuiButtonHMI extends GuiButton {
+public class HMIGuiButton extends GuiButton {
 	
 	public int iconIndex = -1;
 	public boolean tmiStyle = false;
 	private ItemStack item;
 
-	public GuiButtonHMI(int id, int x, int y, int width, int height, String text) {
+	public HMIGuiButton(int id, int x, int y, int width, int height, String text) {
 		super(id, x, y, width, height, text);
 	}
 	
-	public GuiButtonHMI(int id, int x, int y, int width, int iconIndex) {
+	public HMIGuiButton(int id, int x, int y, int width, int iconIndex) {
 		super(id, x, y, width, width, "");
 		this.iconIndex = iconIndex;
 	}
 	
-	public GuiButtonHMI(int id, int x, int y, int width, int iconIndex, ItemStack item) {
+	public HMIGuiButton(int id, int x, int y, int width, int iconIndex, ItemStack item) {
 		this(id, x, y, width, iconIndex);
 		this.item = item;
 	}
@@ -31,7 +31,7 @@ public class GuiButtonHMI extends GuiButton {
             return;
         }
         FontRenderer fontrenderer = minecraft.fontRenderer;
-        Utils.bindTexture("/gui/gui.png");
+        HMIUtils.bindTexture("/gui/gui.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         boolean isHovered = i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
         int k = getHoverState(isHovered);
@@ -41,7 +41,7 @@ public class GuiButtonHMI extends GuiButton {
         drawTexturedModalRect(xPosition + width / 2, yPosition + height / 2, 200 - width / 2, 46 + k * 20 + 20 - height / 2, width / 2, height / 2);
         mouseDragged(minecraft, i, j);
         if(item != null && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
-        	Utils.drawItemStack(xPosition + 2, yPosition + 2, item, true);
+        	HMIUtils.drawItemStack(xPosition + 2, yPosition + 2, item, true);
         }
         else if(iconIndex < 0) {
         	if(!enabled)
@@ -57,7 +57,7 @@ public class GuiButtonHMI extends GuiButton {
             }
         }
         else {
-        	Utils.bindTexture();
+        	HMIUtils.bindTexture();
         	drawTexturedModalRect(xPosition, yPosition, (iconIndex % 12)*21, (iconIndex / 12)*21, width, width);
         }
     }

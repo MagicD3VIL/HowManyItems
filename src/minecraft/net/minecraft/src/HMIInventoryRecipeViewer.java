@@ -10,17 +10,17 @@ import java.util.Stack;
 //            IInventory, CraftingManager, ModLoader, ItemStack, 
 //            IRecipe, ShapedRecipes, ShapelessRecipes, EntityPlayer
 
-public class InventoryRecipeViewer
+public class HMIInventoryRecipeViewer
     implements IInventory
 {
-	public InventoryRecipeViewer(ItemStack itemstack)
+	public HMIInventoryRecipeViewer(ItemStack itemstack)
     {
 		newList = true;
 		//setFilter(null);
 		
     }
     
-    public void initTab(Tab tab) {
+    public void initTab(HMITab tab) {
     	currentTab = tab;
     	newList = true;
     	index = setIndex(tab.lastIndex);
@@ -111,10 +111,10 @@ public class InventoryRecipeViewer
     public void onInventoryChanged() { }
     
     public Stack<ItemStack> filter = new Stack<ItemStack>(); 
-    public Stack<Tab> prevTabs = new Stack<Tab>(); 
+    public Stack<HMITab> prevTabs = new Stack<HMITab>();
     public Stack<Integer> prevPages = new Stack<Integer>(); 
     public Stack<Boolean> prevGetUses = new Stack<Boolean>();
-    public Tab currentTab = mod_HowManyItems.getTabs().get(0);
+    public HMITab currentTab = mod_HowManyItems.getTabs().get(0);
     
     public Boolean newList = false;
     //protected ItemStack filter;
